@@ -1,0 +1,32 @@
+services:
+  laravel_franken:
+    container_name: laravel_franken
+    image: image_laravel_franken
+    build: .
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/vendor  # Hindari cache vendor agar tidak bentrok
+      - /app/node_modules  # Hindari cache node_modules jika pakai frontend
+    depends_on:
+      - mariadb  # Pastikan Laravel hanya berjalan setelah MariaDB siap
+
+  mariadb:
+    container_name: mariadb
+    image: mariadb:latest
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laraveluser
+      MYSQL_PASSWORD: secret
+    volumes:
+      - mariadb_data:/var/lib/mysql  # Menyimpan data database agar tidak hilang saat restart
+
+volumes:
+  mariadb_data:  # Volume untuk MariaDB
